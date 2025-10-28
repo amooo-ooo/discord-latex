@@ -9,7 +9,6 @@ import {
   verifyKey,
 } from 'discord-interactions';
 import { LATEX_COMMAND } from './commands.js';
-import { getCuteUrl } from './reddit.js';
 // import { InteractionResponseFlags } from 'discord-interactions';
 
 class JsonResponse extends Response {
@@ -59,12 +58,27 @@ router.post('/', async (request, env) => {
     // Most user commands will come as `APPLICATION_COMMAND`.
     switch (interaction.data.name.toLowerCase()) {
       case LATEX_COMMAND.name.toLowerCase(): {
-        const cuteUrl = await getCuteUrl();
         return new JsonResponse({
-          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          type: InteractionResponseType.MODAL,
           data: {
-            content: cuteUrl,
-          },
+            custom_id: "latex_modal",
+            title: "Enter LaTeX Expression",
+            components: [
+              {
+                type: 18,
+                label: "LaTeX Expression",
+                component: {
+                  type: 4, // Text Input
+                  custom_id: "latex_expression",
+                  style: 2, // Multi-line Input
+                  placeholder: "Enter your LaTeX expression here...",
+                  min_length: 1,
+                  max_length: 4000,
+                  required: true
+                },
+              }
+            ]
+          }
         });
       }
       default:
@@ -72,8 +86,23 @@ router.post('/', async (request, env) => {
     }
   }
 
-  console.error('Unknown Type');
-  return new JsonResponse({ error: 'Unknown Type' }, { status: 400 });
+  if (interaction.type === InteractionType.MODAL_SUBMIT) {
+    const { custom_id } = interaction.data;
+    switch (custom_id) {
+      case 'latex_modal': {
+        const latexExpression = interaction.data.components[0].component.value;
+        return new JsonResponse({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+            // TODO: Render the LaTeX expression and return an image
+            content: `You submitted the following LaTeX expression:\n\`\`\`\n${latexExpression}\n\`\`\``,
+          },
+        });
+      }
+      default:
+        return new JsonResponse({ error: 'Unknown Type' }, { status: 400 });
+    }
+  }
 });
 router.all('*', () => new Response('Not Found.', { status: 404 }));
 

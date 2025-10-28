@@ -4,6 +4,7 @@
  */
 
 export const LATEX_COMMAND = {
-  name: 'latex',
-  description: 'Render LaTeX in Discord.',
+  name: 'lx',
+  description: 'Prompts for a LaTeX expression to render.',
 };
+
