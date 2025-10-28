@@ -1,10 +1,10 @@
-import { AWW_COMMAND, INVITE_COMMAND } from './commands.js';
+import { LATEX_COMMAND } from './commands.js';
 import dotenv from 'dotenv';
 import process from 'node:process';
 
 /**
  * This file is meant to be run from the command line, and is not used by the
- * application server.  It's allowed to use node.js primitives, and only needs
+ * application server. It's allowed to use node.js primitives, and only needs
  * to be run once.
  */
 
@@ -34,7 +34,7 @@ const response = await fetch(url, {
     Authorization: `Bot ${token}`,
   },
   method: 'PUT',
-  body: JSON.stringify([AWW_COMMAND, INVITE_COMMAND]),
+  body: JSON.stringify([LATEX_COMMAND]),
 });
 
 if (response.ok) {
