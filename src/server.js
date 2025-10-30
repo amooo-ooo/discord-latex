@@ -9,6 +9,8 @@ import {
   verifyKey,
 } from 'discord-interactions';
 import { LATEX_COMMAND } from './commands.js';
+import { render } from './latex/index.js';
+
 // import { InteractionResponseFlags } from 'discord-interactions';
 
 class JsonResponse extends Response {
@@ -37,11 +39,12 @@ router.get('/', (request, env) => {
  * include a JSON payload described here:
  * https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
  */
-router.post('/', async (request, env) => {
+router.post('/', async (request, env, ctx) => {
   const { isValid, interaction } = await server.verifyDiscordRequest(
     request,
     env,
   );
+
   if (!isValid || !interaction) {
     return new Response('Bad request signature.', { status: 401 });
   }
@@ -90,12 +93,16 @@ router.post('/', async (request, env) => {
     const { custom_id } = interaction.data;
     switch (custom_id) {
       case 'latex_modal': {
-        const latexExpression = interaction.data.components[0].component.value;
+        const latexExpression = interaction.data.components[0].component.value.trim();
+        console.log(`Received LaTeX expression: ${latexExpression}`);
+        const svg = await render(latexExpression);
+        console.log(`Rendered SVG: ${svg}`);
+
         return new JsonResponse({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
           data: {
             // TODO: Render the LaTeX expression and return an image
-            content: `You submitted the following LaTeX expression:\n\`\`\`\n${latexExpression}\n\`\`\``,
+            content: svg,
           },
         });
       }

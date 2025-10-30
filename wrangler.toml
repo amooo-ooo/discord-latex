@@ -1,8 +1,15 @@
 name = "discord-latex"
 main = "./src/server.js"
 compatibility_date="2023-05-18"
+compatibility_flags = ["nodejs_compat"]
 
 # [secrets]
 # DISCORD_TOKEN
 # DISCORD_PUBLIC_KEY
 # DISCORD_APPLICATION_ID
+
+[[rules]]
+type = "Data"
+globs = ["**/*.gz"]
+fallthrough = true
+
