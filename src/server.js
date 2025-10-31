@@ -9,6 +9,7 @@ import {
   verifyKey,
 } from 'discord-interactions';
 import { LATEX_COMMAND } from './commands.js';
+import { render } from './latex.js';
 // import { InteractionResponseFlags } from 'discord-interactions';
 
 class JsonResponse extends Response {
@@ -37,7 +38,7 @@ router.get('/', (request, env) => {
  * include a JSON payload described here:
  * https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
  */
-router.post('/', async (request, env) => {
+router.post('/', async (request, env, ctx) => {
   const { isValid, interaction } = await server.verifyDiscordRequest(
     request,
     env,
@@ -66,7 +67,7 @@ router.post('/', async (request, env) => {
             components: [
               {
                 type: 18,
-                label: "LaTeX Expression",
+                label: "Expression",
                 component: {
                   type: 4, // Text Input
                   custom_id: "latex_expression",
@@ -91,12 +92,46 @@ router.post('/', async (request, env) => {
     switch (custom_id) {
       case 'latex_modal': {
         const latexExpression = interaction.data.components[0].component.value;
+        const { token } = interaction;
+        const webhookUrl = `https://discord.com/api/v10/webhooks/${env.DISCORD_APPLICATION_ID}/${token}`;
+
+        ctx.waitUntil(
+          (async () => {
+            try {
+              const imageUrl = await render(latexExpression);
+              if (!imageUrl) {
+                throw new Error('Render function returned no data. Check logs.');
+              }
+
+              await fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  embeds: [
+                    {
+                      image: {
+                        url: imageUrl,
+                        description: latexExpression
+                      }
+                    }
+                  ]
+                }),
+              });
+            } catch (error) {
+              console.error(error);
+              await fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  content: `Sorry, there was an error rendering your LaTeX: \`${error.message}\``,
+                }),
+              });
+            }
+          })()
+        );
+
         return new JsonResponse({
-          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-          data: {
-            // TODO: Render the LaTeX expression and return an image
-            content: `You submitted the following LaTeX expression:\n\`\`\`\n${latexExpression}\n\`\`\``,
-          },
+          type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
         });
       }
       default:
