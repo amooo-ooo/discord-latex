@@ -8,7 +8,7 @@ import {
   InteractionType,
   verifyKey,
 } from 'discord-interactions';
-import { LATEX_COMMAND } from './commands.js';
+import { LATEX_COMMAND,LX_COMMAND } from './commands.js';
 import { render } from './latex.js';
 // import { InteractionResponseFlags } from 'discord-interactions';
 
@@ -55,6 +55,7 @@ router.post('/', async (request, env, ctx) => {
     });
   }
 
+  // https://discord.com/developers/docs/interactions/application-commands#slash-commands
   if (interaction.type === InteractionType.APPLICATION_COMMAND) {
     // Most user commands will come as `APPLICATION_COMMAND`.
     switch (interaction.data.name.toLowerCase()) {
@@ -80,6 +81,50 @@ router.post('/', async (request, env, ctx) => {
               }
             ]
           }
+        });
+      }
+      case LX_COMMAND.name.toLowerCase(): {
+        const latexExpression = interaction.data.options?.[0]?.value;
+        const { token } = interaction;
+        const webhookUrl = `https://discord.com/api/v10/webhooks/${env.DISCORD_APPLICATION_ID}/${token}`;
+
+        ctx.waitUntil(
+          (async () => {
+            try {
+              const imageUrl = await render(latexExpression);
+              if (!imageUrl) {
+                throw new Error('Render function returned no data. Check logs.');
+              }
+
+              await fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  embeds: [
+                    {
+                      image: {
+                        url: imageUrl,
+                        description: latexExpression
+                      }
+                    }
+                  ]
+                }),
+              });
+            } catch (error) {
+              console.error(error);
+              await fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  content: `Sorry, there was an error rendering your LaTeX: \`${error.message}\``,
+                }),
+              });
+            }
+          })()
+        );
+
+        return new JsonResponse({
+          type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
         });
       }
       default:

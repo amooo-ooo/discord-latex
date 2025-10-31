@@ -1,4 +1,4 @@
-import { LATEX_COMMAND } from './commands.js';
+import { LATEX_COMMAND, LX_COMMAND } from './commands.js';
 import dotenv from 'dotenv';
 import process from 'node:process';
 
@@ -34,7 +34,7 @@ const response = await fetch(url, {
     Authorization: `Bot ${token}`,
   },
   method: 'PUT',
-  body: JSON.stringify([LATEX_COMMAND]),
+  body: JSON.stringify([LATEX_COMMAND, LX_COMMAND]),
 });
 
 if (response.ok) {

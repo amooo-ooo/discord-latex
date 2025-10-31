@@ -74,8 +74,8 @@ export async function render(formula) {
   const formData = {
     formula: cleanFormula,
     preamble: preamble,
-    fsize: '21px',
-    fcolor: 'd9d9dc',
+    fsize: '22px',
+    fcolor: 'bec0cb',
     mode: '0',
     out: '1',
     remhost: 'quicklatex.com',
