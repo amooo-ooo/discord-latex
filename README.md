@@ -3,13 +3,16 @@
 Render LaTeX in Discord. LaTeX+ is a Discord app powered by Cloudflare Workers
 and [QuickLaTeX](https://quicklatex.com/). It supports packages including
 `tikz`, `pgfplots`, and `chemfig`, with colours themed for Discord. An
-experimental renderer using TikZJax on WebAssembly for Cloudflare Workers is
-in development.
+experimental renderer using TikZJax on WebAssembly for Cloudflare Workers is in
+development.
+
+- [**Privacy Policy**](./PRIVACY.md)
+- [**Terms of Service**](./TERMS.md)
+- [**License**](./LICENSE)
 
 <!-- ![LaTeX+ in action](https://user-images.githubusercontent.com/534619/157503404-a6c79d1b-f0d0-40c2-93cb-164f9df7c138.gif) -->
 
 ## Deployment
-
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/amooo-ooo/discord-latex)
 
