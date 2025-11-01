@@ -6,7 +6,7 @@
 export const LX_COMMAND = {
   name: 'lx',
   description: 'Quickly render a simple LaTeX formula.',
-  type: 1, // CHAT_INPUT
+  // type: 1, // CHAT_INPUT
   options: [
     {
       name: 'formula',
@@ -21,7 +21,7 @@ export const LX_COMMAND = {
 
 export const LATEX_COMMAND = {
   name: 'latex',
-  type: 1,
+  // type: 1,
   description: 'Opens a prompt for a complex LaTeX expression to render.',
   integration_types: [0, 1],
   contexts: [0, 1, 2]
