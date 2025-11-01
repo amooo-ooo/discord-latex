@@ -8,7 +8,7 @@ import {
   InteractionType,
   verifyKey,
 } from 'discord-interactions';
-import { LATEX_COMMAND,LX_COMMAND } from './commands.js';
+import { LATEX_COMMAND, LX_COMMAND } from './commands.js';
 import { render } from './latex.js';
 // import { InteractionResponseFlags } from 'discord-interactions';
 

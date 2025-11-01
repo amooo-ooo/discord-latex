@@ -21,6 +21,7 @@ export const LX_COMMAND = {
 
 export const LATEX_COMMAND = {
   name: 'latex',
+  type: 1,
   description: 'Opens a prompt for a complex LaTeX expression to render.',
   integration_types: [0, 1],
   contexts: [0, 1, 2]
